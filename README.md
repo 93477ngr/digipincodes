@@ -28,12 +28,12 @@ India Post DIGIPIN reference: https://github.com/INDIAPOST-gov/digipin
 
 ## Generate nationwide data
 1. Register at https://data.gov.in/ and obtain an API key.
-2. Set it locally (never commit or expose the key):
+**Village and area search can be built without an API key.** The first run downloads the pinned LGD master roster and creates the searchable national village/area index; postal links remain unavailable until you configure a key.\n\n2. For source-listed PIN mappings, set the key locally (never commit or expose it):
    - PowerShell: $env:DATA_GOV_KEY="YOUR_KEY"
    - macOS/Linux: export DATA_GOV_KEY="YOUR_KEY"
 3. Install Python 3.10+ and Requests: python -m pip install requests pandas pyarrow
 4. Run: python scripts/build_directory.py
-5. Review printed counts and inspect known villages and postal mappings before publishing.
+5. Review printed counts and inspect known villages and postal mappings before publishing. Without a key, prior PIN associations are retained if present; otherwise only the village and administrative area directory is generated.
 
 The builder requests all configured LGD state codes with pagination and stops if an API response is incomplete. Check current API schema, quota and coverage before release. A successful download alone is not proof of accuracy.
 
