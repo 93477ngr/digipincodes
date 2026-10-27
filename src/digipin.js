@@ -6,7 +6,7 @@ export function getDigiPin(lat,lon){
  if(!Number.isFinite(lat)||!Number.isFinite(lon))throw new TypeError("Coordinates must be finite numbers.");
  if(lat<BOUNDS.minLat||lat>BOUNDS.maxLat||lon<BOUNDS.minLon||lon>BOUNDS.maxLon)throw new RangeError("Coordinate is outside DIGIPIN coverage.");
  let a=BOUNDS.minLat,b=BOUNDS.maxLat,c=BOUNDS.minLon,d=BOUNDS.maxLon,out="";
- for(let i=0;i<10;i++){const h=(b-a)/4,w=(d-c)/4;let r=3-Math.floor((lat-a)/h),col=Math.floor((lon-c)/w);r=Math.max(0,Math.min(3,r));col=Math.max(0,Math.min(3,col));out+=GRID[r][col];b=a+h*(4-r);a=a+h*(3-r);c=c+w*col;d=c+w*(col+1);}
+ for(let i=0;i<10;i++){const h=(b-a)/4,w=(d-c)/4;let r=3-Math.floor((lat-a)/h),col=Math.floor((lon-c)/w);r=Math.max(0,Math.min(3,r));col=Math.max(0,Math.min(3,col));out+=GRID[r][col];b=a+h*(4-r);a=a+h*(3-r);const nextLonMin=c+w*col,nextLonMax=c+w*(col+1);c=nextLonMin;d=nextLonMax;}
  return out;
 }
 export function getLatLngFromDigiPin(value){
