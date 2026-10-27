@@ -31,7 +31,7 @@ India Post DIGIPIN reference: https://github.com/INDIAPOST-gov/digipin
 2. Set it locally (never commit or expose the key):
    - PowerShell: $env:DATA_GOV_KEY="YOUR_KEY"
    - macOS/Linux: export DATA_GOV_KEY="YOUR_KEY"
-3. Install Python 3.10+ and Requests: python -m pip install requests
+3. Install Python 3.10+ and Requests: python -m pip install requests pandas pyarrow
 4. Run: python scripts/build_directory.py
 5. Review printed counts and inspect known villages and postal mappings before publishing.
 
