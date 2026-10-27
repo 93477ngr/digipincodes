@@ -66,22 +66,39 @@ def main():
     offset+=len(recs)
    print("PIN crosswalk state",state,"rows",got,"expected",expected)
    if expected and got<expected:raise RuntimeError("Incomplete data.gov.in page sequence for state "+str(state))
- name_shards=collections.defaultdict(list);pin_map=collections.defaultdict(list)
+ name_shards=collections.defaultdict(list);pin_map=collections.defaultdict(list);area_groups=collections.defaultdict(dict)
  for v in villages.values():
   v["pins"]=sorted(v["pins"])
   if not v["name"]:continue
   name_shards[key_for(v["name"])].append(v)
   for pin in v["pins"]:pin_map[pin].append({"id":v["id"],"name":v["name"],"subdistrict":v["subdistrict"],"district":v["district"],"state":v["state"]})
- (OUT/"villages").mkdir(parents=True,exist_ok=True);(OUT/"pins").mkdir(parents=True,exist_ok=True)
+  member={"id":v["id"],"name":v["name"],"stateCode":v["stateCode"],"state":v["state"],"districtCode":v["districtCode"],"district":v["district"],"subdistrictCode":v["subdistrictCode"],"subdistrict":v["subdistrict"],"pins":v["pins"]}
+  if v["subdistrictCode"] and v["subdistrict"]:
+   aid="sub:"+v["subdistrictCode"]
+   ent=area_groups[aid].setdefault("record",{"id":aid,"kind":"mandal","name":v["subdistrict"],"district":v["district"],"state":v["state"],"villages":[]})
+   ent["villages"].append(member)
+  if v["districtCode"] and v["district"]:
+   aid="district:"+v["districtCode"]
+   ent=area_groups[aid].setdefault("record",{"id":aid,"kind":"district","name":v["district"],"state":v["state"],"villages":[]})
+   ent["villages"].append(member)
+ (OUT/"villages").mkdir(parents=True,exist_ok=True);(OUT/"pins").mkdir(parents=True,exist_ok=True);(OUT/"areas").mkdir(parents=True,exist_ok=True)
  for key,items in name_shards.items():
   items.sort(key=lambda v:(norm(v["name"]),v["state"],v["district"],v["subdistrict"],v["id"]))
   (OUT/"villages"/(key+".json")).write_text(json.dumps(items,ensure_ascii=False,separators=(",",":")),"utf-8")
+ area_shards=collections.defaultdict(list)
+ for item in area_groups.values():
+  area=item["record"]
+  area["villages"].sort(key=lambda v:(norm(v["name"]),v["state"],v["district"],v["id"]))
+  area_shards[key_for(area["name"])].append(area)
+ for key,items in area_shards.items():
+  items.sort(key=lambda a:(norm(a["name"]),a["kind"],a["state"],a["district"],a["id"]))
+  (OUT/"areas"/(key+".json")).write_text(json.dumps(items,ensure_ascii=False,separators=(",",":")),"utf-8")
  pin_shards=collections.defaultdict(dict)
  for pin,records in pin_map.items():
   unique={v["id"]:v for v in records}
   pin_shards[pin[:2]][pin]=sorted(unique.values(),key=lambda v:(norm(v["name"]),v["state"],v["district"],v["id"]))
  for key,items in pin_shards.items():(OUT/"pins"/(key+".json")).write_text(json.dumps(items,ensure_ascii=False,separators=(",",":")),"utf-8")
- meta={"schemaVersion":1,"generatedAt":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"sourceRoster":"LGD village export mirror, pinned revision d43ab199f27e472f64f88d291a7cf9511aa899ed (see upstream metadata)","postalSource":"data.gov.in LGD - Villages with PIN Codes","resourceId":RESOURCE,"villageRecords":len(villages),"villageShards":{k:len(v) for k,v in name_shards.items()},"pinCount":len(pin_map),"pinShards":sorted(pin_shards),"publishedPinLinksRead":seen_links,"note":"Roster villages without source PIN associations remain searchable. Only source-listed PINs are shown; no mapping is inferred."}
+ meta={"schemaVersion":1,"generatedAt":time.strftime("%Y-%m-%dT%H:%M:%SZ",time.gmtime()),"sourceRoster":"LGD village export mirror, pinned revision d43ab199f27e472f64f88d291a7cf9511aa899ed (see upstream metadata)","postalSource":"data.gov.in LGD - Villages with PIN Codes","resourceId":RESOURCE,"villageRecords":len(villages),"villageShards":{k:len(v) for k,v in name_shards.items()},"areaShards":{k:len(v) for k,v in area_shards.items()},"pinCount":len(pin_map),"pinShards":sorted(pin_shards),"publishedPinLinksRead":seen_links,"note":"Roster villages without source PIN associations remain searchable. Only source-listed PINs are shown; no mapping is inferred."}
  (OUT/"manifest.json").write_text(json.dumps(meta,ensure_ascii=False,indent=2)+"\n","utf-8")
  print("Built",len(villages),"LGD village IDs;",len(pin_map),"PINs;",seen_links,"source PIN links.")
 if __name__=="__main__":main()
