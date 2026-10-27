@@ -5,11 +5,18 @@ on:
   pull_request:
     branches: [main]
 jobs:
-  tests:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - run: node --check src/app.js
+      - run: node --check src/digipin.js
+      - run: node --check scripts/test-digipin.js
       - run: npm test
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m py_compile scripts/build_directory.py
