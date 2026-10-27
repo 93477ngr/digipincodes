@@ -3,7 +3,7 @@
 Needs DATA_GOV_KEY; uses a pinned public export of the LGD master village roster
 plus data.gov.in's official LGD villages-with-PIN resource.
 """
-import collections,io,json,os,pathlib,re,sys,time,requests
+import collections,io,json,os,pathlib,re,sys,time,unicodedata,requests
 import pandas as pd
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 OUT=ROOT/"data"
@@ -11,7 +11,12 @@ RESOURCE="f17a1608-5f10-4610-bb50-a63c80d83974"
 API="https://api.data.gov.in/resource/"+RESOURCE
 # Versioned public mirror of a government-exported LGD village roster. Its metadata documents source, checksum and row count.
 ROSTER_URL="https://raw.githubusercontent.com/vanga/india-local-government-directory/d43ab199f27e472f64f88d291a7cf9511aa899ed/data/lgd_villages.parquet"
-def norm(s):return re.sub(r"\s+"," ",str(s or "")).strip().casefold()
+def norm(s):
+ # Keep this key algorithm in sync with src/app.js browser normalization.
+ value=unicodedata.normalize("NFKD",str(s or ""))
+ value="".join(ch for ch in value if not unicodedata.combining(ch))
+ value=value.encode("ascii","ignore").decode("ascii").lower()
+ return re.sub(r"[^a-z0-9]+"," ",value).strip()
 def key_for(s):
  chars=[c for c in norm(s) if c.isalnum()]
  return "".join(chars[:2]) if len(chars)>1 else ("".join(chars)+"_") if chars else "__"
