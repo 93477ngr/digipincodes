@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e3a8a">
+  <title>Smart Address, Pincode &amp; DigiPIN Finder</title>
+  <meta name="description" content="Search India's village directory, administrative areas, PIN codes and post offices. Generate an official-format DIGIPIN from a map point or live location.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" integrity="sha512-hkXJ5Q9z3M9r3y9j8x8f1vM4T2f3fC9cQkYvY6xV7XfFhP7QkY0o8J3bD2V2Y8Jm0Z8xF8J9Z9N9y8f8J8Q==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js" integrity="sha512-hkXJ5Q9z3M9r3y9j8x8f1vM4T2f3fC9cQkYvY6xV7XfFhP7QkY0o8J3bD2V2Y8Jm0Z8xF8J9Z9N9y8f8J8Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="module" src="./src/app.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <h1 class="brand">Smart Address, Pincode &amp; DigiPIN Finder</h1>
+      <p class="sub">Search Indian villages, mandals, districts, PIN codes and post offices. Get a DIGIPIN from your live location or any point on the map.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel" aria-label="Search">
+      <form class="search" id="searchForm" autocomplete="off" role="search">
+        <div class="field">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="q" type="search" role="combobox" aria-expanded="false" aria-controls="sugg" aria-autocomplete="list" placeholder="Type a village, mandal, district or 6-digit PIN" aria-label="Search village, mandal, district or PIN code" enterkeyhint="search" maxlength="100">
+          <ul id="sugg" role="listbox" hidden></ul>
+        </div>
+        <button class="btn-primary" id="goBtn" type="submit">Search</button>
+      </form>
+      <div class="mode" id="mode" aria-live="polite">Loading the India village and postal directories…</div>
+      <div class="gps">
+        <button class="btn-gps" id="gpsBtn" type="button">📍 Use Live Location · Get My DigiPIN</button>
+        <small>Location permission is requested only after you press the button. DIGIPIN is calculated on this device.</small>
+      </div>
+      <div class="mine" id="mine" aria-live="polite">
+        <div class="digipin">
+          <span class="lbl" id="mineLabel">🚀 Your DIGIPIN</span>
+          <span class="code" id="myCode">—</span>
+          <button class="copy" id="myCopy" type="button" disabled>Copy to Clipboard</button>
+        </div>
+        <div class="coords" id="myCoords"></div>
+        <div class="coords" id="myNear"></div>
+      </div>
+    </section>
+
+    <div id="map" role="region" aria-label="Map of India; tap any point to calculate its DIGIPIN"></div>
+    <p class="maphint">Tap anywhere on the map to calculate the DIGIPIN for that coordinate. A map point is not automatically a verified postal address.</p>
+
+    <section class="status" id="status" aria-live="polite">
+      <div class="banner empty"><span>ℹ️</span><div><strong>Loading searchable data</strong>The full village index and post-office directory are loaded in the background.</div></div>
+    </section>
+    <div id="count" class="count" hidden></div>
+    <section class="grid" id="results" aria-label="Search results"></section>
+    <div class="loadmore-wrap"><button id="loadMore" class="btn-secondary" type="button" hidden>Load more results</button></div>
+  </main>
+
+  <footer>
+    <p>Village directory: Local Government Directory (LGD), Ministry of Panchayati Raj. Postal office directory: India Post data republished via data.gov.in. DIGIPIN algorithm: Department of Posts official open-source implementation.</p>
+    <p>PIN mappings are labelled as official or candidate. A candidate office-name match is not a confirmed village-to-PIN assignment. No PIN is guessed when a reliable mapping is unavailable.</p>
+  </footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
