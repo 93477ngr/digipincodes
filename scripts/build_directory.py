@@ -6,7 +6,7 @@ plus data.gov.in's official LGD villages-with-PIN resource.
 import collections,io,json,os,pathlib,re,sys,time,requests
 import pandas as pd
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-OUT=ROOT/"public"/"data"
+OUT=ROOT/"data"
 RESOURCE="f17a1608-5f10-4610-bb50-a63c80d83974"
 API="https://api.data.gov.in/resource/"+RESOURCE
 # Versioned public mirror of a government-exported LGD village roster. Its metadata documents source, checksum and row count.
